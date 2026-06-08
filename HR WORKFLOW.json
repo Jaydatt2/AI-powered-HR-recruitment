@@ -1,0 +1,995 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "inputDataFieldName": "Resume",
+        "name": "={{ $json[\"HDN-JOB-CODE\"] }}-{{ $json[\"First Name \"] }}-{{ $json[\"Last Name \"] }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1XIw5zm_jC62mVTiSFpI0oJpc_AyCgygB",
+          "mode": "list",
+          "cachedResultName": "DriveHub",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1XIw5zm_jC62mVTiSFpI0oJpc_AyCgygB"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -768,
+        -528
+      ],
+      "id": "c6a98c8a-fe71-40aa-9ab6-daa79f9251c0",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "og7RuXxQ03T1zNXw",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Resume",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -784,
+        -256
+      ],
+      "id": "117bfd29-a8c5-41b7-8f72-008e283f3920",
+      "name": "Extract from File to Resume"
+    },
+    {
+      "parameters": {
+        "formTitle": "Apply For The Job ",
+        "formDescription": "Civil Engineer ",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "First Name "
+            },
+            {
+              "fieldLabel": "Last Name "
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "=Resume",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            },
+            {
+              "fieldType": "hiddenField",
+              "fieldName": "HDN-JOB-CODE",
+              "fieldValue": "JOB-CODE-001"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -1184,
+        -544
+      ],
+      "id": "07005df9-91bf-4326-8505-da3e8faf8441",
+      "name": "Form Submission - Civil",
+      "webhookId": "25238f10-1a27-4712-a02b-16ab67cc1e83",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"telephone\": {\n      \"type\": \"string\",\n      \"description\": \"Phone number of the contact (digits only)\"\n    },\n    \"city\": {\n      \"type\": \"string\",\n      \"description\": \"City of the contact\"\n    },\n    \"full_name\": {\n      \"type\": \"string\",\n      \"description\": \"Full name of the contact\"\n    },\n    \"email\": {\n      \"type\": \"string\",\n      \"format\": \"email\",\n      \"description\": \"Email address of the contact\"\n    },\n    \"linkedin_profile\": {\n      \"type\": \"string\",\n      \"format\": \"url\",\n      \"description\": \"LinkedIn Profile of the contact\"\n    }\n  },\n  \"required\": [\n    \"full_name\",\n    \"email\",\n    \"telephone\",\n    \"city\",\n    \"linkedin_profile\"\n  ]\n}",
+        "options": {
+          "systemPromptTemplate": "You are an expert information extraction algorithm.\n\nExtract only the requested attributes from the provided text.\nDo not infer, guess, or generate information that is not explicitly present.\nIf an attribute cannot be found in the text, return \"NA\" for that attribute.\n\nReturn the output strictly according to the provided JSON schema."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -496,
+        -512
+      ],
+      "id": "484ee959-3b61-402f-9b76-eb4643e5e87c",
+      "name": "Extractor Personal Information"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        -48
+      ],
+      "id": "b96e8055-9248-479c-adad-76feb6b6ca5c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "YpsFKg7yjRm6H2y7",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Educational Qulification ",
+              "description": "Summery of acadamic careear, focusing on undergraduate and university studies. Summarize in 100 Word Maximum.",
+              "required": true
+            },
+            {
+              "name": "Job History ",
+              "description": "Work History summary, docusing on most resent work experiance Summarize in 100 Word maximum",
+              "required": true
+            },
+            {
+              "name": "Skills",
+              "description": "Extract the candidate's technical skills. What they use in functional skills they are proficient in. Make a bulleted list.",
+              "required": true
+            },
+            {
+              "name": "Experiance",
+              "description": "Detailed summary of the candidate's work experience, including job title, company name, employment period, key responsibilities, achievements, skills, tools, technologies, internships, and freelance projects.",
+              "required": true
+            },
+            {
+              "name": "Title & Employer ",
+              "description": "Extract most resent job Title and Employer ",
+              "required": true
+            },
+            {
+              "name": "Total Year Experiance ",
+              "description": "Extract total years of professional experience and format as Total Years Exp:"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        -224
+      ],
+      "id": "7144811d-b402-4880-baa2-8f6138af0c23",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -112,
+        -432
+      ],
+      "id": "f71e13b3-8a59-4e59-82de-0dadd4743517",
+      "name": "Unified Candidate Profile"
+    },
+    {
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "combineMapPrompt": "=Given the information below for a job applicant, write a concise summary for it. While summarizing, be professional, concise, & conversational. Use 400 words or less.\n\nHere is the detailed information about the applicant:\n\nName: {{ $json.output.full_name }}\nCity: {{ $json.output.city }}\nEducational qualification: {{ $json.output[\"Educational Qulification\"] }}\nJob History: {{ $json.output[\"Job History\"] }}\nSkills: {{ $json.output[\"Skills\"] }}\nPrevious experience: {{ $json.output[\"Experiance\"] }}\nApplied date: {{ $now.format('yyyy-MM-dd') }}",
+              "prompt": "=Given the information below for a job applicant, write a concise summary for it. While summarizing, be professional, concise, & conversational. Use 400 words or less.\n\nHere is the detailed information about the applicant:\n\nName: {{ $json.output.full_name }}\nCity: {{ $json.output.city }}\nEducational qualification: {{ $json.output[\"Educational Qulification\"] }}\nJob History: {{ $json.output[\"Job History\"] }}\nSkills: {{ $json.output[\"Skills\"] }}\nPrevious experience: {{ $json.output[\"Experiance\"] }}\nApplied date: {{ $now.format('yyyy-MM-dd') }}"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        -432
+      ],
+      "id": "7fc64a43-d13f-4906-af2f-7792006e32dd",
+      "name": "Profile Summarization"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "12XtPWMZTuifjZIiFLDCvslra6MI1d3oU7zAxlpdpPH8"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -432
+      ],
+      "id": "e27a34c9-ec7d-4beb-965b-baa37ecf6e0f",
+      "name": "Get a Job Posting",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "XHsqnU31VLonsXdX",
+          "name": "Google Docs OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Job Post Details \n{{ $json.content }}\n\nHere Is The Candidate Profile Summary:\n{{ $('Profile Summarization').item.json.output.text }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an advanced AI Recruitment Specialist and Technical Talent Screener.\n\nYour task is to analyze the Job Description and Candidate Profile, then determine whether the candidate should be shortlisted for a technical interview.\n\n[JOB DESCRIPTION]\n\n{{ $json.content }}\n\n---\n\n[CANDIDATE PROFILE]\n\n{{ $('Profile Summarization').item.json.output.text }}\n\n---\n\nSCREENING CRITERIA:\n\n1. Skills Match\n\n   * Compare candidate skills against the required skills in the Job Description.\n   * Consider technical skills, tools, frameworks, programming languages, and platforms.\n\n2. Experience Match\n\n   * Verify whether the candidate meets the required years of experience.\n   * Evaluate relevance of previous roles and responsibilities.\n\n3. Project Relevance\n\n   * Check whether the candidate has worked on projects similar to the responsibilities described in the Job Description.\n\n4. Education Match\n\n   * Compare the candidate's educational background with the preferred qualifications.\n\nSCORING RULES:\n\n* Skills Match: 50%\n* Experience Match: 25%\n* Project Relevance: 15%\n* Education Match: 10%\n\nCalculate an overall match percentage between 0 and 100.\n\nSHORTLISTING RULE:\n\n* Match Percentage ≥ 70 → Shortlist\n* Match Percentage < 70 → Reject\n\nOUTPUT REQUIREMENTS:\n\nReturn ONLY a valid JSON object.\nDo not include explanations, markdown, code blocks, or any text outside the JSON.\n\n{\n\"candidate_name\": \"\",\n\"candidate_email\": \"\",\n\"match_percentage\": \"\",\n\"status\": \"\",\n\"screening_summary\": \"\",\n\"key_strengths\": [],\n\"missing_skills_or_gaps\": [],\n\"recommended_interview_topics\": []\n}\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        656,
+        -432
+      ],
+      "id": "23e7b9aa-3143-4d60-90fd-3331ca788070",
+      "name": "Evaluate & Score Profile"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"ai_resume_score\": {\n      \"type\": \"number\"\n    },\n    \"ai_evaluation\": {\n      \"type\": \"string\"\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        -224
+      ],
+      "id": "ee2beb8e-c2ea-4d91-b5e6-e3823dd3bcce",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.ai_resume_score }}",
+                    "rightValue": 70,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    },
+                    "id": "ab0ec6af-5836-4dbe-9958-e80ff77b6d71"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "CANDIDATE SHORTLISTED"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3986de9c-c1f2-46bf-9584-953b9d44d06c",
+                    "leftValue": "={{ $json.output.ai_resume_score }}",
+                    "rightValue": 50,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "MAYBE"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "IGNORED"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        976,
+        -432
+      ],
+      "id": "36fca527-7554-4d83-bc8d-5044699a3ca9",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ce2debbf-00bf-4c3d-bcde-8a2ba96edb9b",
+              "name": "ai_status",
+              "value": "Shortlisted",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1360,
+        -672
+      ],
+      "id": "95cf0e16-4626-49be-a94e-4e9eb0f14e8e",
+      "name": "SHORTLISTED"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ce2debbf-00bf-4c3d-bcde-8a2ba96edb9b",
+              "name": "ai_status",
+              "value": "MAYBE",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1360,
+        -416
+      ],
+      "id": "9bbd03df-4d61-4bba-bae6-91cadd0d727e",
+      "name": "MAYBE"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ce2debbf-00bf-4c3d-bcde-8a2ba96edb9b",
+              "name": "ai_status",
+              "value": "IGNORED",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1360,
+        -176
+      ],
+      "id": "b451ebff-00a1-460b-bbaa-c8dfa6403ca1",
+      "name": "IGNORED"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1icMgnp18jmMqbSnkgZZ6jp-WGZMXCy2xhFT_RAehpZc",
+          "mode": "list",
+          "cachedResultName": "JOB APLLICATION TRACKER",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1icMgnp18jmMqbSnkgZZ6jp-WGZMXCy2xhFT_RAehpZc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1icMgnp18jmMqbSnkgZZ6jp-WGZMXCy2xhFT_RAehpZc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "HDN-JOB-CODE": "={{ $('Form Submission - Civil').item.json['HDN-JOB-CODE'] }}",
+            "APPLICANT NAME ": "={{ $('Form Submission - Civil').item.json['First Name '] }}-{{ $('Form Submission - Civil').item.json['Last Name '] }}",
+            "APPLICANT EMAIL ": "={{ $('Form Submission - Civil').item.json.Email }}",
+            "APPLICATION DATE ": "={{ $('Form Submission - Civil').item.json.submittedAt.toDateTime().format('yyyy-MM-dd') }}",
+            "FINAL SCORE": "={{ $json.output.ai_resume_score }}",
+            "AI STATUS ": "={{ $json.ai_status }}",
+            "AI ASSESMENT ": "={{ $json.output.ai_evaluation }}",
+            "APPLICANT PHONE ": "={{ $('Extractor Personal Information').item.json.output.telephone }}",
+            "APPLICANT EDUCATION ": "={{ $('Information Extractor').item.json.output['Educational Qulification '] }}",
+            "JOB HISTORY": "={{ $('Information Extractor').item.json.output['Job History '] }}",
+            "SKILLS ": "={{ $('Information Extractor').item.json.output.Skills }}",
+            "EXPERIACE SUMMARY ": "={{ $('Information Extractor').item.json.output.Experiance }}",
+            "TOTAL EXPERIANCE ": "={{ $('Information Extractor').item.json.output['Total Year Experiance '] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "HDN-JOB-CODE",
+              "displayName": "HDN-JOB-CODE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HIRING MANAGER ",
+              "displayName": "HIRING MANAGER ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "HIRING MANAGER EMAIL ",
+              "displayName": "HIRING MANAGER EMAIL ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "APPLICANT NAME ",
+              "displayName": "APPLICANT NAME ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "APPLICANT EMAIL ",
+              "displayName": "APPLICANT EMAIL ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "APPLICATION DATE ",
+              "displayName": "APPLICATION DATE ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "FINAL SCORE",
+              "displayName": "FINAL SCORE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "AI STATUS ",
+              "displayName": "AI STATUS ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "AI ASSESMENT ",
+              "displayName": "AI ASSESMENT ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TOTAL EXPERIANCE ",
+              "displayName": "TOTAL EXPERIANCE ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "EXPERIACE SUMMARY ",
+              "displayName": "EXPERIACE SUMMARY ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "JOB HISTORY",
+              "displayName": "JOB HISTORY",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKILLS ",
+              "displayName": "SKILLS ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "APPLICANT LOCATION ",
+              "displayName": "APPLICANT LOCATION ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "APPLICANT PHONE ",
+              "displayName": "APPLICANT PHONE ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "APPLICANT EDUCATION ",
+              "displayName": "APPLICANT EDUCATION ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "locationDefine": {
+            "values": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1840,
+        -416
+      ],
+      "id": "1c75732d-b634-4686-aec6-ca7947d0b826",
+      "name": "Application Evalution",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vOKJ39M4jrJDeV1l",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# AI-Powered Recruitment Assistant Workflow\n\n## 1. Candidate Application Intake\n\nApplications are automatically collected through multiple channels, including web forms and email submissions. Candidate resumes and profile information are captured and stored for further processing.\n\n## 2. Automated Resume Analysis\n\nThe AI engine extracts and evaluates candidate information, including:\n\n* Personal Information\n* Educational Qualifications\n* Technical Skills\n* Professional Experience\n* Project Portfolio\n* Certifications and Achievements\n\nA structured candidate profile is generated for standardized evaluation.\n\n## 3. Intelligent Candidate Screening\n\nEach candidate is assessed against the relevant Job Description (JD) using predefined screening criteria:\n\n* Technical Skills Match\n* Experience Alignment\n* Project Relevance\n* Educational Qualification Match\n\nAn AI-generated suitability score is calculated to determine candidate fit.\n\n### Screening Decision Rules\n\n* **Score ≥ 70:** Shortlisted for Technical Interview\n* **Score 50–69:** Review Required (Maybe)\n* **Score < 50:** Archived / Rejected\n\n## 4. Candidate Tracking & Record Management\n\nAll candidate records, screening outcomes, resumes, and evaluation reports are automatically stored in centralized cloud storage and logged within the Applicant Tracking System (ATS).\n\n## 5. Hiring Team Notification\n\nFor shortlisted candidates, automated notifications are sent to recruiters and hiring managers. Candidate details, evaluation summaries, and screening scores are included to support interview scheduling and decision-making.\n\n## 6. Technical Interview Preparation\n\nFor qualified candidates, the system automatically generates role-specific technical interview questions based on:\n\n* Resume Content\n* Skills Assessment\n* Job Requirements\n* Project Experience\n\n## 7. Recruitment Analytics & Reporting\n\nThe platform maintains a complete audit trail of applications, screening decisions, interview recommendations, and hiring outcomes to support recruitment analytics and performance tracking.\n",
+        "height": 1200,
+        "width": 976
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2224,
+        -1040
+      ],
+      "typeVersion": 1,
+      "id": "e2a6229c-2bdf-46b0-8c4c-d6bf4dd0022e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Senior Technical Assessment Designer.\n\nCreate a professional technical assessment based on the candidate's target job role.\n\nRequirements:\n- Duration: 45 Minutes\n- Total Questions: 20\n- 12 MCQ Questions\n- 8 Theoretical Questions\n- Intermediate Difficulty\n- Include correct answers for MCQs\n- Include expected answers for theoretical questions\n\nCandidate Information:\n\n{{ $json[\"SKILLS \"] }}\n\n{{ $json[\"JOB HISTORY\"] }}\n\n{{ $json[\"EXPERIACE SUMMARY \"] }}\n\nGenerate the assessment in a clean professional format.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2048,
+        -416
+      ],
+      "id": "04758361-902f-4c29-91fd-1fca14ebb237",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2048,
+        -208
+      ],
+      "id": "90f058d2-aa5d-4973-8975-84732816648d",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "YpsFKg7yjRm6H2y7",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Application Evalution').item.json['APPLICANT EMAIL '] }}",
+        "subject": "Congratulations!  You have been shortlisted for the next stage of our recruitment process.",
+        "emailType": "text",
+        "message": "=Dear Candidate,\n\nCongratulations!\n\nYou have been shortlisted for the next stage of our recruitment process.\n\nPlease complete the attached technical assessment within 45 minutes.\n\nAssessment Link:\n\n\nRegards,\nHR Team",
+        "options": {
+          "senderName": "HR Team"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2400,
+        -416
+      ],
+      "id": "96f590a4-daf2-4423-8a6c-5b37179e02aa",
+      "name": "Send a message",
+      "webhookId": "b5e67d88-2578-458d-a793-11af3aa42afb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rQmKEYGN1cftWnnK",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2208,
+        -240
+      ],
+      "id": "19713b66-b07b-4616-8e0f-dd5e8371a9e9",
+      "name": "Structured Output Parser1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Upload file": {
+      "main": [
+        []
+      ]
+    },
+    "Form Submission - Civil": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract from File to Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File to Resume": {
+      "main": [
+        [
+          {
+            "node": "Extractor Personal Information",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extractor Personal Information",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Profile Summarization",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Evaluate & Score Profile",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extractor Personal Information": {
+      "main": [
+        [
+          {
+            "node": "Unified Candidate Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Unified Candidate Profile",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Unified Candidate Profile": {
+      "main": [
+        [
+          {
+            "node": "Profile Summarization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Profile Summarization": {
+      "main": [
+        [
+          {
+            "node": "Get a Job Posting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a Job Posting": {
+      "main": [
+        [
+          {
+            "node": "Evaluate & Score Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Evaluate & Score Profile",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate & Score Profile": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "SHORTLISTED",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MAYBE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IGNORED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SHORTLISTED": {
+      "main": [
+        [
+          {
+            "node": "Application Evalution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MAYBE": {
+      "main": [
+        [
+          {
+            "node": "Application Evalution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IGNORED": {
+      "main": [
+        [
+          {
+            "node": "Application Evalution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Application Evalution": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5723d2f3-d4f6-419d-92ac-4f9e30a8fc95",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ee45f4e018d607aa6478fa4953860b77ac4eed63c13f21c99058a967adc4d933"
+  },
+  "nodeGroups": [],
+  "id": "4VFmGHHoUp2CFxSq",
+  "tags": []
+}
